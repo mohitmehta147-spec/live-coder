@@ -198,9 +198,15 @@ async function healthReport() {
   try {
     fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK);
     out.uploads.ok = true;
+    // how many media files are actually on disk (helps debug "images missing")
+    const idx = buildFileIndex();
+    out.uploads.files = idx.size;
+    out.uploads.topLevel = fs.readdirSync(UPLOAD_DIR).slice(0, 20);
+    out.uploads.sample = [...idx.keys()].slice(0, 5);
   } catch (e) {
     out.uploads.error = e.message;
   }
+
 
   out.ok = out.db.ok && out.uploads.ok;
   out.status = out.ok ? "healthy" : "degraded";
