@@ -44,6 +44,13 @@ export function mediaUrl(input?: string | null): string {
 
   const file = parsed.pathname.split("/").filter(Boolean).pop() || "";
   if (!file || !/\.(png|jpe?g|webp|gif|avif|svg)$/i.test(file)) return "";
+  // Supabase storage URL me bucket subfolder hota hai (e.g. .../object/public/product-images/abc.jpg)
+  // — Hostinger uploads me bhi wahi subfolder structure hai, to use preserve karo.
+  const bucketMatch = parsed.pathname.match(/\/(product-images|review-images|uploads)\//i);
+  if (bucketMatch) {
+    const sub = bucketMatch[1] === "uploads" ? "" : `${bucketMatch[1]}/`;
+    return `/uploads/${sub}${file}`;
+  }
   return `/uploads/${file}`;
 }
 
