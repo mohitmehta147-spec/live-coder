@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
   useRouter,
   HeadContent,
@@ -11,6 +10,18 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { CartProvider } from "@/contexts/CartContext";
+import CartSidebar from "@/components/CartSidebar";
+import FreeDeliveryBar from "@/components/FreeDeliveryBar";
+import LanguageSelectionPopup from "@/components/LanguageSelectionPopup";
+import ThemeSettingsSync from "@/components/ThemeSettingsSync";
+import ScrollToTop from "@/components/ScrollToTop";
+import ImageFallback from "@/components/ImageFallback";
+import MetaPixelRouteTracker from "@/components/MetaPixelRouteTracker";
 
 function NotFoundComponent() {
   return (
@@ -22,12 +33,12 @@ function NotFoundComponent() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <div className="mt-6">
-          <Link
-            to="/"
+          <a
+            href="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Go home
-          </Link>
+          </a>
         </div>
       </div>
     </div>
@@ -77,14 +88,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "VedicUpchar" },
+      { name: "description", content: "Authentic Ayurvedic Healthcare Products & Doctor Consultation" },
+      { name: "author", content: "VedicUpchar" },
+      { property: "og:title", content: "VedicUpchar" },
+      { property: "og:description", content: "Authentic Ayurvedic Healthcare Products & Doctor Consultation" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@VedicUpchar" },
     ],
     links: [
       {
@@ -92,6 +103,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800;9..144,900&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -119,8 +143,22 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <LanguageProvider>
+        <CartProvider>
+          <ThemeSettingsSync />
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <LanguageSelectionPopup />
+            <CartSidebar />
+            <FreeDeliveryBar />
+            <ScrollToTop />
+            <ImageFallback />
+            <MetaPixelRouteTracker />
+            <Outlet />
+          </TooltipProvider>
+        </CartProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
