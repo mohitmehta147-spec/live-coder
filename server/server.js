@@ -195,6 +195,26 @@ async function healthReport() {
     out.db.error = e.code ? `${e.code}: ${e.message}` : e.message;
   }
 
+  out.uploads.cwd = process.cwd();
+  try {
+    // kaunse candidate paths me media actually dikh raha hai
+    const candidates = [
+      UPLOAD_DIR,
+      path.resolve(process.cwd(), "uploads"),
+      path.resolve(process.cwd(), "..", "uploads"),
+      path.resolve(__dirname, "..", "uploads"),
+      "/home/u243635001/uploads",
+    ];
+    out.uploads.candidates = [...new Set(candidates)].map((p) => {
+      try {
+        const entries = fs.readdirSync(p);
+        return { path: p, exists: true, entries: entries.slice(0, 10) };
+      } catch (e) {
+        return { path: p, exists: false, error: e.code || e.message };
+      }
+    });
+  } catch { /* non-fatal */ }
+
   try {
     fs.accessSync(UPLOAD_DIR, fs.constants.R_OK | fs.constants.W_OK);
     out.uploads.ok = true;
@@ -206,6 +226,7 @@ async function healthReport() {
   } catch (e) {
     out.uploads.error = e.message;
   }
+
 
 
   out.ok = out.db.ok && out.uploads.ok;
