@@ -96,7 +96,11 @@ const MEDIA_TOKEN = /\{\{API\}\}/g;
 const MEDIA_CACHE_VERSION = "20260829-1";
 
 function localUploadUrl(pathname: string): string {
-  const [path, query = ""] = pathname.split("?", 2);
+  const [rawPath, query = ""] = pathname.split("?", 2);
+  // Legacy blog rows were saved as /uploads/blogs/<file>, while Hostinger
+  // stores blog media inside uploads/product-images/blogs/. Keep old DB rows
+  // working without requiring a bulk database rewrite.
+  const path = rawPath.replace(/^\/uploads\/blogs\//i, "/uploads/product-images/blogs/");
   const params = new URLSearchParams(query);
   params.set("media_v", MEDIA_CACHE_VERSION);
   const resolved = `${path}?${params.toString()}`;

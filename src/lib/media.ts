@@ -19,6 +19,9 @@ export function mediaUrl(input?: string | null): string {
   if (u.startsWith("data:") || u.startsWith("blob:")) return u;
 
   // Already local
+  if (/^\/uploads\/blogs\//i.test(u)) {
+    return u.replace(/^\/uploads\/blogs\//i, "/uploads/product-images/blogs/");
+  }
   if (u.startsWith("/uploads/")) return u;
   if (u.startsWith("/")) return u;
 
@@ -46,6 +49,8 @@ export function mediaUrl(input?: string | null): string {
   if (!file || !/\.(png|jpe?g|webp|gif|avif|svg)$/i.test(file)) return "";
   // Supabase storage URL me bucket subfolder hota hai (e.g. .../object/public/product-images/abc.jpg)
   // — Hostinger uploads me bhi wahi subfolder structure hai, to use preserve karo.
+  const legacyBlogMatch = parsed.pathname.match(/\/blogs\/([^/]+)$/i);
+  if (legacyBlogMatch) return `/uploads/product-images/blogs/${legacyBlogMatch[1]}`;
   const bucketMatch = parsed.pathname.match(/\/(product-images|review-images|uploads)\//i);
   if (bucketMatch) {
     const sub = bucketMatch[1] === "uploads" ? "" : `${bucketMatch[1]}/`;
