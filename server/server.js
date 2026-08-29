@@ -56,8 +56,13 @@ app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 // ---------------------------------------------------------------- uploads ---
 const UPLOAD_DIR = config.UPLOAD_DIR;
+const MEDIA_DIRS = config.MEDIA_DIRS || [UPLOAD_DIR];
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-app.use("/uploads", express.static(UPLOAD_DIR, { maxAge: "30d", immutable: false }));
+// Try every visible media root. This survives Hostinger deploys where File
+// Manager and the Node app expose the same uploads folder under different paths.
+for (const mediaDir of MEDIA_DIRS) {
+  app.use("/uploads", express.static(mediaDir, { maxAge: "30d", immutable: false }));
+}
 
 // Fallback chain for /uploads/* when the exact file is not on disk:
 //   1) same basename anywhere inside UPLOAD_DIR (folder ka naam DB me alag ho sakta hai)
@@ -72,7 +77,7 @@ const MEDIA_BUCKETS = (process.env.MEDIA_FALLBACK_BUCKETS ||
 
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|avif|svg)$/i;
 
-/** basename -> absolute path index of everything already on disk */
+/** basename -> absolute path index of everything visible on disk */
 let fileIndex = null;
 let fileIndexAt = 0;
 function buildFileIndex() {
@@ -86,7 +91,7 @@ function buildFileIndex() {
       else if (!map.has(e.name)) map.set(e.name, p);
     }
   };
-  walk(UPLOAD_DIR);
+  for (const mediaDir of MEDIA_DIRS) walk(mediaDir);
   fileIndex = map;
   fileIndexAt = Date.now();
   return map;
@@ -175,7 +180,7 @@ async function healthReport() {
     public_url: config.PUBLIC_URL,
     api: { ok: true },
     db: { ok: false, host: DB_HOST, name: process.env.DB_NAME || null },
-    uploads: { ok: false, dir: UPLOAD_DIR },
+    uploads: { ok: false, dir: UPLOAD_DIR, media_dirs: MEDIA_DIRS },
     frontend: { build: hasBuildRef.value ? "present" : "missing" },
   };
 
@@ -204,6 +209,8 @@ async function healthReport() {
       path.resolve(process.cwd(), "..", "uploads"),
       path.resolve(__dirname, "..", "uploads"),
       "/home/u243635001/uploads",
+      "/home/u243635001/domains/vedicupchar.com/uploads",
+      "/home/u243635001/domains/vedicupchar.com/public_html/uploads",
     ];
     out.uploads.candidates = [...new Set(candidates)].map((p) => {
       try {
