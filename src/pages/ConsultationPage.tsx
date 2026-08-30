@@ -553,6 +553,12 @@ const ConsultationPage = () => {
                       <p className="text-lg text-primary/85 font-bold mt-2">
                         {lang === "hi" ? special.subtitleHi : special.subtitle}
                       </p>
+                      {(special.tagline || special.taglineHi) && (
+                        <p className="text-sm text-muted-foreground italic mt-1.5">
+                          “{lang === "hi" ? (special.taglineHi || special.tagline) : (special.tagline || special.taglineHi)}”
+                        </p>
+                      )}
+
                     </div>
 
                     <div className="order-3 md:order-1">
