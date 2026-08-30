@@ -553,6 +553,12 @@ const ConsultationPage = () => {
                       <p className="text-lg text-primary/85 font-bold mt-2">
                         {lang === "hi" ? special.subtitleHi : special.subtitle}
                       </p>
+                      {(special.tagline || special.taglineHi) && (
+                        <p className="text-sm text-muted-foreground italic mt-1.5">
+                          “{lang === "hi" ? (special.taglineHi || special.tagline) : (special.tagline || special.taglineHi)}”
+                        </p>
+                      )}
+
                     </div>
 
                     <div className="order-3 md:order-1">
@@ -566,7 +572,13 @@ const ConsultationPage = () => {
                         <p className="text-lg md:text-xl text-primary/85 font-bold mt-2">
                           {lang === "hi" ? special.subtitleHi : special.subtitle}
                         </p>
+                        {(special.tagline || special.taglineHi) && (
+                          <p className="text-sm md:text-base text-muted-foreground italic mt-2">
+                            “{lang === "hi" ? (special.taglineHi || special.tagline) : (special.tagline || special.taglineHi)}”
+                          </p>
+                        )}
                       </div>
+
 
 
                        {/* Stats row */}
@@ -598,6 +610,12 @@ const ConsultationPage = () => {
                             {special['mrp'] > 0 ? Math.round(((special['mrp'] - special['price']) / special['mrp']) * 100) : 0}% OFF
                           </span>
                         </div>
+                        {special.duration && (
+                          <div className="inline-flex items-center gap-1.5 bg-card/80 backdrop-blur rounded-full px-3 py-1.5 border border-primary/15 text-xs font-semibold text-foreground">
+                            <Clock className="h-3.5 w-3.5 text-primary" /> {special.duration}
+                          </div>
+                        )}
+
                         <button onClick={() => handleSelectType(buildSpecialType(special))}
                           className="flex-1 min-w-[220px] bg-cta text-cta-foreground px-6 py-3.5 rounded-2xl font-extrabold text-sm md:text-base hover:opacity-95 shadow-lg shadow-cta/30 flex items-center justify-center gap-2 transition-all duration-150 active:scale-95 active:shadow-inner active:brightness-90">
                           📅 {t("Book Your Consultation Now", "अभी परामर्श बुक करें")} <ChevronRight className="h-5 w-5" />
