@@ -620,10 +620,17 @@ const ConsultationPage = () => {
                           className="flex-1 min-w-[220px] bg-cta text-cta-foreground px-6 py-3.5 rounded-2xl font-extrabold text-sm md:text-base hover:opacity-95 shadow-lg shadow-cta/30 flex items-center justify-center gap-2 transition-all duration-150 active:scale-95 active:shadow-inner active:brightness-90">
                           📅 {t("Book Your Consultation Now", "अभी परामर्श बुक करें")} <ChevronRight className="h-5 w-5" />
                         </button>
+
+                        {/* Rating — same row as price & CTA */}
+                        <div className="inline-flex items-center gap-2 bg-card/90 backdrop-blur border border-primary/10 rounded-full px-4 py-2.5 shadow-sm">
+                          <span className="text-cta">★</span>
+                          <span className="text-sm font-bold text-foreground">{special.rating}</span>
+                          <span className="text-xs text-muted-foreground">({special.reviewsCount} {t("Reviews", "समीक्षाएँ")})</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 flex flex-col items-center md:items-stretch gap-4">
+                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 self-start flex flex-col items-center md:items-end gap-4">
                       <div className="relative">
                         <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden ring-4 ring-cta/50 bg-primary/10">
                           <img loading="lazy" decoding="async" src={special.photoUrl || anilBansalAsset.url} alt={special.name}
@@ -631,13 +638,8 @@ const ConsultationPage = () => {
                             className="w-full h-full object-cover object-top" />
                         </div>
                       </div>
-                      {/* Rating — directly below the doctor's photo */}
-                      <div className="inline-flex items-center gap-2 bg-card/90 backdrop-blur border border-primary/10 rounded-full px-3 py-1.5 mt-3 shadow-sm">
-                        <span className="text-cta">★</span>
-                        <span className="text-sm font-bold text-foreground">{special.rating}</span>
-                        <span className="text-xs text-muted-foreground">({special.reviewsCount} {t("Reviews", "समीक्षाएँ")})</span>
-                      </div>
                     </div>
+
                   </div>
 
                   {/* Feature strip */}
