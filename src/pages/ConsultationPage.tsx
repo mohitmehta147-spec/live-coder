@@ -610,6 +610,12 @@ const ConsultationPage = () => {
                             {special['mrp'] > 0 ? Math.round(((special['mrp'] - special['price']) / special['mrp']) * 100) : 0}% OFF
                           </span>
                         </div>
+                        {special.duration && (
+                          <div className="inline-flex items-center gap-1.5 bg-card/80 backdrop-blur rounded-full px-3 py-1.5 border border-primary/15 text-xs font-semibold text-foreground">
+                            <Clock className="h-3.5 w-3.5 text-primary" /> {special.duration}
+                          </div>
+                        )}
+
                         <button onClick={() => handleSelectType(buildSpecialType(special))}
                           className="flex-1 min-w-[220px] bg-cta text-cta-foreground px-6 py-3.5 rounded-2xl font-extrabold text-sm md:text-base hover:opacity-95 shadow-lg shadow-cta/30 flex items-center justify-center gap-2 transition-all duration-150 active:scale-95 active:shadow-inner active:brightness-90">
                           📅 {t("Book Your Consultation Now", "अभी परामर्श बुक करें")} <ChevronRight className="h-5 w-5" />
