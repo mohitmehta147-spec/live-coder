@@ -572,7 +572,13 @@ const ConsultationPage = () => {
                         <p className="text-lg md:text-xl text-primary/85 font-bold mt-2">
                           {lang === "hi" ? special.subtitleHi : special.subtitle}
                         </p>
+                        {(special.tagline || special.taglineHi) && (
+                          <p className="text-sm md:text-base text-muted-foreground italic mt-2">
+                            “{lang === "hi" ? (special.taglineHi || special.tagline) : (special.tagline || special.taglineHi)}”
+                          </p>
+                        )}
                       </div>
+
 
 
                        {/* Stats row */}
