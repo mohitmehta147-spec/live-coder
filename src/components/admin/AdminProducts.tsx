@@ -234,15 +234,26 @@ const AdminProducts = () => {
     return newUrls;
   };
 
+  const appendBannerUrls = (existing: string, urls: string[], max = 5) => {
+    const list = existing.split(/\n|,|\|/).map(s => s.trim()).filter(Boolean);
+    return [...list, ...urls].slice(0, max).join("\n");
+  };
+
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const [url] = await uploadFilesToBucket(e.target.files);
-    if (url) setForm(prev => ({ ...prev, banner_image: url }));
+    const urls = await uploadFilesToBucket(e.target.files);
+    if (urls.length > 0) setForm(prev => ({ ...prev, banner_image: appendBannerUrls(prev.banner_image, urls) }));
     e.target.value = "";
   };
 
   const handleSectionBannerUpload = async (field: "benefits_banner" | "benefits_banner_mobile" | "ingredients_banner" | "ingredients_banner_mobile" | "banner_image_mobile", e: React.ChangeEvent<HTMLInputElement>) => {
-    const [url] = await uploadFilesToBucket(e.target.files);
-    if (url) setForm(prev => ({ ...prev, [field]: url }));
+    const urls = await uploadFilesToBucket(e.target.files);
+    if (urls.length > 0) {
+      setForm(prev => {
+        // banner_image_mobile is a multi-image list (up to 5); others are single-image fields
+        if (field === "banner_image_mobile") return { ...prev, [field]: appendBannerUrls(prev[field] || "", urls) };
+        return { ...prev, [field]: urls[0] };
+      });
+    }
     e.target.value = "";
   };
 
