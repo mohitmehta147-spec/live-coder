@@ -541,7 +541,7 @@ const ConsultationPage = () => {
               {/* Special: Anil Bansal — premium hero card */}
               {special.active && (
                 <div className="relative overflow-hidden rounded-3xl mb-6 md:mb-10 border border-cta/30 bg-linear-to-br from-[color-mix(in_oklab,var(--primary)_8%,transparent)] via-background to-[color-mix(in_oklab,var(--cta)_10%,transparent)] shadow-xl">
-                  <div className="relative grid grid-cols-1 md:grid-cols-[1fr,auto] gap-6 p-5 md:p-8 items-center">
+                  <div className="relative grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 p-5 md:p-8 items-center">
                     {/* Mobile-only title block at the very top */}
                     <div className="order-1 md:hidden text-center">
                       <div className="inline-flex items-center gap-1.5 bg-cta/15 text-cta px-3 py-1.5 rounded-full text-[11px] font-extrabold uppercase tracking-wide mb-3">
@@ -630,7 +630,7 @@ const ConsultationPage = () => {
                       </div>
                     </div>
 
-                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 self-start flex flex-col items-center md:items-end gap-4">
+                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 md:self-center flex flex-col items-center md:items-end gap-4">
                       <div className="relative">
                         <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden ring-4 ring-cta/50 bg-primary/10">
                           <img loading="lazy" decoding="async" src={special.photoUrl || anilBansalAsset.url} alt={special.name}
