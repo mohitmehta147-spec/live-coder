@@ -630,7 +630,7 @@ const ConsultationPage = () => {
                       </div>
                     </div>
 
-                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 self-start flex flex-col items-center md:items-end gap-4">
+                    <div className="order-2 md:order-2 relative mx-auto md:mx-0 md:self-center flex flex-col items-center md:items-end gap-4">
                       <div className="relative">
                         <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden ring-4 ring-cta/50 bg-primary/10">
                           <img loading="lazy" decoding="async" src={special.photoUrl || anilBansalAsset.url} alt={special.name}
