@@ -60,12 +60,31 @@ const HeroBanner = () => {
     return () => clearInterval(timer);
   }, [slides]);
 
+  // Swipe support: left swipe = next slide, right swipe = previous slide
+  const touchStartX = useRef<number | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0]?.clientX ?? null; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || !slides || slides.length <= 1) return;
+    const endX = e.changedTouches[0]?.clientX ?? touchStartX.current;
+    const dx = endX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 40) return;
+    if (dx < 0) setCurrent((p) => (p + 1) % slides.length);
+    else setCurrent((p) => (p - 1 + slides.length) % slides.length);
+  };
+
   if (!slides) return <div className="w-full aspect-[4/3] md:aspect-auto md:min-h-[440px] bg-muted animate-pulse" aria-hidden />;
   const slide = slides[current] || slides[0];
   if (!slide) return null;
 
   return (
-    <section className="relative overflow-hidden" aria-label="Hero banner" style={slide.bgColor ? { backgroundColor: slide.bgColor } : undefined}>
+    <section
+      className="relative overflow-hidden"
+      aria-label="Hero banner"
+      style={slide.bgColor ? { backgroundColor: slide.bgColor } : undefined}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Mobile: a proper tall frame so wide desktop art never looks like a thin strip.
           When a dedicated mobile image is uploaded it is shown at its own ratio. */}
       <div className="md:hidden px-3 pt-3 pb-2">
