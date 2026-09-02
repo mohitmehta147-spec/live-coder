@@ -11,6 +11,84 @@ const emptyForm = {
   tags: "", meta_title: "", meta_description: "", is_published: false, author: "VedicUpchar",
 };
 
+// WordPress-style visual rich-text editor (with raw HTML toggle)
+const RichEditor = ({ value, onChange, minHeight = 220 }: { value: string; onChange: (html: string) => void; minHeight?: number }) => {
+  const [htmlMode, setHtmlMode] = useState(false);
+  const areaRef = useRef<HTMLDivElement>(null);
+  const lastEmitted = useRef(value);
+
+  // Sync external value changes (e.g. loading a blog for edit) into the visual area
+  useEffect(() => {
+    if (!htmlMode && areaRef.current && value !== lastEmitted.current) {
+      areaRef.current.innerHTML = value || "";
+    }
+  }, [value, htmlMode]);
+
+  const exec = (cmd: string, arg?: string) => {
+    areaRef.current?.focus();
+    document.execCommand(cmd, false, arg);
+    emit();
+  };
+  const emit = () => {
+    const html = areaRef.current?.innerHTML || "";
+    lastEmitted.current = html;
+    onChange(html);
+  };
+  const insertLink = () => {
+    const url = prompt("Link URL:", "https://");
+    if (url) exec("createLink", url);
+  };
+  const insertImage = () => {
+    const url = prompt("Image URL:");
+    if (url) exec("insertImage", url);
+  };
+
+  const btn = "px-2 py-1 rounded-md bg-background border border-border hover:bg-primary hover:text-primary-foreground transition text-xs";
+
+  return (
+    <div className="border border-border rounded-lg overflow-hidden">
+      <div className="flex flex-wrap items-center gap-1 p-2 bg-muted/40 border-b border-border">
+        {!htmlMode && (
+          <>
+            <button type="button" onClick={() => exec("formatBlock", "h2")} className={btn}>H2</button>
+            <button type="button" onClick={() => exec("formatBlock", "h3")} className={btn}>H3</button>
+            <button type="button" onClick={() => exec("formatBlock", "p")} className={btn}>¶</button>
+            <span className="w-px h-4 bg-border mx-0.5" />
+            <button type="button" onClick={() => exec("bold")} className={`${btn} font-bold`}>B</button>
+            <button type="button" onClick={() => exec("italic")} className={`${btn} italic`}>I</button>
+            <button type="button" onClick={() => exec("underline")} className={`${btn} underline`}>U</button>
+            <span className="w-px h-4 bg-border mx-0.5" />
+            <button type="button" onClick={() => exec("insertUnorderedList")} className={btn}>• List</button>
+            <button type="button" onClick={() => exec("insertOrderedList")} className={btn}>1. List</button>
+            <button type="button" onClick={() => exec("formatBlock", "blockquote")} className={btn}>❝ Quote</button>
+            <span className="w-px h-4 bg-border mx-0.5" />
+            <button type="button" onClick={insertLink} className={btn}>🔗 Link</button>
+            <button type="button" onClick={insertImage} className={btn}>🖼 Image</button>
+            <button type="button" onClick={() => exec("removeFormat")} className={btn}>✕ Clear</button>
+          </>
+        )}
+        <button type="button" onClick={() => setHtmlMode(m => !m)}
+          className={`ml-auto px-2 py-1 rounded-md text-xs font-medium border transition ${htmlMode ? "bg-primary text-primary-foreground border-primary" : "bg-background border-border hover:bg-muted"}`}>
+          {htmlMode ? "👁 Visual" : "</> HTML"}
+        </button>
+      </div>
+      {htmlMode ? (
+        <textarea value={value} onChange={e => onChange(e.target.value)} rows={12}
+          className="w-full px-3 py-2 text-sm bg-background font-mono focus:outline-none" />
+      ) : (
+        <div
+          ref={areaRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={emit}
+          style={{ minHeight }}
+          className="w-full px-3 py-2 text-sm bg-background focus:outline-none overflow-y-auto max-h-[500px] prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-headings:font-bold prose-h2:text-xl prose-h3:text-lg prose-a:text-primary prose-strong:text-foreground prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:py-1 prose-blockquote:px-3 prose-img:rounded-xl"
+        />
+      )}
+    </div>
+  );
+};
+
 const WORDPRESS_BLOG_SOURCE = "https://bansalyoga.in";
 
 const AdminBlogs = () => {
