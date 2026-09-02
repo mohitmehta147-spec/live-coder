@@ -377,8 +377,10 @@ const AdminBlogs = () => {
               ))}
             </div>
 
-            <textarea placeholder="Content (HTML supported — write like WordPress: use <h2>, <p>, <ul>, <img> etc.)" value={form.content} onChange={e => setForm({...form, content: e.target.value})}
-              rows={12} className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background font-mono" />
+            <div>
+              <p className="text-xs font-semibold mb-1 text-muted-foreground">Content (English) — visual editor, WordPress jaisa</p>
+              <RichEditor value={form.content} onChange={html => setForm(f => ({ ...f, content: html }))} />
+            </div>
 
             {/* Live Preview (matches BlogDetailPage rendering) */}
             {form.content && (
