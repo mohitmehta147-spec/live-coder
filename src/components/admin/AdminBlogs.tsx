@@ -407,8 +407,10 @@ const AdminBlogs = () => {
               </div>
             )}
 
-            <textarea placeholder="Content Hindi (HTML supported)" value={form.content_hi} onChange={e => setForm({...form, content_hi: e.target.value})}
-              rows={8} className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-background font-mono" />
+            <div>
+              <p className="text-xs font-semibold mb-1 text-muted-foreground">Content (Hindi)</p>
+              <RichEditor value={form.content_hi} onChange={html => setForm(f => ({ ...f, content_hi: html }))} minHeight={140} />
+            </div>
           </div>
 
 
