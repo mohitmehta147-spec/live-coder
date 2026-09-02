@@ -15,7 +15,7 @@ const emptyForm = {
 const RichEditor = ({ value, onChange, minHeight = 220 }: { value: string; onChange: (html: string) => void; minHeight?: number }) => {
   const [htmlMode, setHtmlMode] = useState(false);
   const areaRef = useRef<HTMLDivElement>(null);
-  const lastEmitted = useRef(value);
+  const lastEmitted = useRef<string | null>(null);
 
   // Sync external value changes (e.g. loading a blog for edit) into the visual area
   useEffect(() => {
