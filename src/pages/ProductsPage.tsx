@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useSearchParams } from "@/hooks/use-search-params";
 import { ShoppingCart, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useDiscountedProducts } from "@/hooks/use-countdown-discount";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import TopBar from "@/components/TopBar";
@@ -19,7 +20,8 @@ type Product = {
 type Category = { id: string; name: string; name_hi: string | null; slug: string; parent_id: string | null };
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [rawProducts, setProducts] = useState<Product[]>([]);
+  const products = useDiscountedProducts(rawProducts) as Product[];
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const { t, lang } = useLanguage();

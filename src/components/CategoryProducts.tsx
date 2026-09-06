@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart, Star, ChevronRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useDiscountedProducts } from "@/hooks/use-countdown-discount";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { withPackPrices, inCategory } from "@/lib/pricing";
@@ -15,7 +16,8 @@ type Product = {
 
 const CategoryProducts = () => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [rawProducts, setProducts] = useState<Product[]>([]);
+  const products = useDiscountedProducts(rawProducts) as Product[];
   const { t, lang } = useLanguage();
   const { addToCart } = useCart();
 

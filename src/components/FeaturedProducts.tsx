@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingCart, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useDiscountedProducts } from "@/hooks/use-countdown-discount";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { withPackPrices } from "@/lib/pricing";
@@ -13,7 +14,8 @@ type Product = {
 };
 
 const FeaturedProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [rawProducts, setProducts] = useState<Product[]>([]);
+  const products = useDiscountedProducts(rawProducts) as Product[];
   const { t, lang } = useLanguage();
   const { addToCart } = useCart();
   const navigate = useNavigate();
