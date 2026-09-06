@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export type CountdownDiscount = {
@@ -86,4 +86,37 @@ export const applyCountdownDiscount = (
   const base = basePrice ?? product.price;
   if (!productEligibleForDiscount(cfg, product)) return base;
   return Math.round(base * (1 - cfg.percent / 100));
+};
+
+/** Same eligibility check but also honours the multi-category list. */
+const eligible = (cfg: CountdownDiscount, p: any) => {
+  if (!isDiscountActive(cfg)) return false;
+  if (cfg.scope === "all") return true;
+  if (cfg.scope === "products") return !!p?.id && cfg.productIds.includes(p.id);
+  if (cfg.scope === "category") {
+    if (!cfg.categoryId) return false;
+    if (p?.category_id === cfg.categoryId) return true;
+    const list = p?.category_ids;
+    if (Array.isArray(list)) return list.includes(cfg.categoryId);
+    if (typeof list === "string") { try { return JSON.parse(list).includes(cfg.categoryId); } catch { return false; } }
+  }
+  return false;
+};
+
+/**
+ * Applies the live countdown discount to a list of products so listings,
+ * cards and the product page all show the same sale price.
+ */
+export const useDiscountedProducts = <T extends Record<string, any>>(rows: T[] | null | undefined): T[] => {
+  const cfg = useCountdownDiscount();
+  return useMemo(() => {
+    const list = rows || [];
+    if (!isDiscountActive(cfg)) return list;
+    return list.map((p) => {
+      if (!eligible(cfg, p)) return p;
+      const price = Math.round((Number(p['price']) || 0) * (1 - cfg.percent / 100));
+      const mrp = Number(p['mrp']) || 0;
+      return { ...p, price, mrp: mrp > price ? mrp : mrp } as T;
+    });
+  }, [rows, cfg]);
 };
