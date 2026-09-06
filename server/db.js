@@ -59,8 +59,23 @@ function parsePgArray(text) {
   return out.map((s) => s.trim()).filter((s) => s.length > 0);
 }
 
+// TINYINT(1) flags come back as 0/1 from MySQL, but the frontend compares them
+// against real booleans (e.g. `is_active !== false`), so 0 was read as "active".
+export const BOOL_COLUMNS = new Set([
+  "is_active", "is_featured", "is_verified", "is_default", "is_read",
+  "show_in_navbar", "show_in_concern", "show_in_shop", "show_in_filters",
+  "is_published", "featured", "in_stock",
+]);
+
 export function decodeValue(col, value) {
+  if (BOOL_COLUMNS.has(col)) {
+    if (value === null || value === undefined) return value;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    if (typeof value === "string") return !(value === "0" || value.toLowerCase() === "false" || value === "");
+  }
   if (typeof value !== "string" || !JSON_COLUMNS.has(col)) return value;
+
   const t = value.trim();
   if (!t || t === "null") return null;
   if (t.startsWith("[") || (t.startsWith("{") && t.endsWith("}") && /^[[{]\s*["\d[{]/.test(t))) {

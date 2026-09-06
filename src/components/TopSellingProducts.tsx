@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ShoppingCart, Star } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useDiscountedProducts } from "@/hooks/use-countdown-discount";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 
@@ -25,7 +26,8 @@ type Config = {
 const DEFAULT_CONFIG: Config = { mode: "auto", product_ids: [], title: "🔥 Top Selling Products", title_hi: "🔥 टॉप सेलिंग प्रोडक्ट्स", subtitle: "Trusted by Thousands, Chosen Every Day", subtitle_hi: "हज़ारों का भरोसा, हर दिन की पसंद", days: 30, limit: 8 };
 
 const TopSellingProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [rawProducts, setProducts] = useState<Product[]>([]);
+  const products = useDiscountedProducts(rawProducts) as Product[];
   const [config, setConfig] = useState<Config>(DEFAULT_CONFIG);
   const { t, lang } = useLanguage();
   const { addToCart } = useCart();

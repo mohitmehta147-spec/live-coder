@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/lib/supabase";
+import { useDiscountedProducts } from "@/hooks/use-countdown-discount";
 import { withPackPrices, inCategory } from "@/lib/pricing";
 import { fetchCategories, concernCategories, type Category } from "@/hooks/use-categories";
 
@@ -17,7 +18,8 @@ type Product = {
 const ConcernProducts = () => {
   const [activeId, setActiveId] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [rawProducts, setProducts] = useState<Product[]>([]);
+  const products = useDiscountedProducts(rawProducts) as Product[];
   const { t, lang } = useLanguage();
   const { addToCart } = useCart();
 
