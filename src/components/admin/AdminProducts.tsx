@@ -130,9 +130,15 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     const { data } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-    setProducts((data as any) || []);
+    // MySQL returns 0/1 for is_active — normalise so the Active/Inactive toggle works.
+    const rows = ((data as any[]) || []).map((p) => ({
+      ...p,
+      is_active: p.is_active === null || p.is_active === undefined ? true : !(p.is_active === 0 || p.is_active === false || p.is_active === "0" || p.is_active === "false"),
+    }));
+    setProducts(rows as any);
     setLoading(false);
   };
+
 
   const fetchCategories = async () => {
     const { data } = await supabase.from("categories").select("id, name, parent_id").order("sort_order");
