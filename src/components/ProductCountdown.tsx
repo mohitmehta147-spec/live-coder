@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Timer } from "lucide-react";
-import { useCountdownDiscount, isDiscountActive } from "@/hooks/use-countdown-discount";
+import { useCountdownDiscount, isDiscountActive, isProductDiscounted } from "@/hooks/use-countdown-discount";
 
 const getNextSunday = () => {
   const now = new Date();
@@ -15,12 +15,13 @@ const getNextSunday = () => {
 /**
  * Sale countdown timer — admin ke "Countdown Discount" setting se chalta hai.
  * endsAt set hai to wahi, warna agla Sunday 23:59 fallback.
+ * `product` dene par sirf us card pe dikhta hai jispe discount lag raha hai.
  */
-const ProductCountdown = ({ compact = false }: { compact?: boolean }) => {
+const ProductCountdown = ({ compact = false, product }: { compact?: boolean; product?: any }) => {
   const cfg = useCountdownDiscount();
   const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
 
-  const active = isDiscountActive(cfg);
+  const active = isDiscountActive(cfg) && (product ? isProductDiscounted(cfg, product) : true);
   const endTime = cfg.endsAt ? new Date(cfg.endsAt).getTime() : getNextSunday().getTime();
 
   useEffect(() => {
