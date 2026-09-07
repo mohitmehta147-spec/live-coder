@@ -324,6 +324,127 @@ if (hasBuild) {
   app.use("/assets", express.static(path.join(DIST_DIR, "assets"), { maxAge: "1y", immutable: true }));
   app.use(express.static(DIST_DIR, { index: false, maxAge: "1h" }));
 
+  // ---- Social-share meta injection (WhatsApp/Facebook crawlers don't run JS) ----
+  // /product/:slug aur /blog/:slug ke liye index.html serve karne se pehle
+  // DB se title/description/image nikaal kar og:/twitter: meta inject karte hain.
+  const escHtml = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  const stripHtml = (s) => String(s ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+
+  const toAbsMedia = (raw, base) => {
+    const u = String(raw || "").trim();
+    if (!u) return "";
+    if (/^https?:\/\//i.test(u)) {
+      // Purane external (supabase/lovable) URLs -> local uploads path
+      if (/supabase\.(co|in)|lovable\.(app|dev)|lovableproject\.com|__l5e/i.test(u)) {
+        try {
+          const p = new URL(u).pathname;
+          const file = p.split("/").filter(Boolean).pop() || "";
+          if (!/\.(png|jpe?g|webp|gif|avif)$/i.test(file)) return "";
+          const blog = p.match(/\/blogs\/([^/]+)$/i);
+          if (blog) return `${base}/uploads/product-images/blogs/${blog[1]}`;
+          const bucket = p.match(/\/(product-images|review-images)\//i);
+          return `${base}/uploads/${bucket ? bucket[1] + "/" : ""}${file}`;
+        } catch { return ""; }
+      }
+      return u;
+    }
+    let p = u.startsWith("/") ? u : `/uploads/${u.replace(/^\/+/, "")}`;
+    if (/^\/uploads\/blogs\//i.test(p)) p = p.replace(/^\/uploads\/blogs\//i, "/uploads/product-images/blogs/");
+    return base + p;
+  };
+
+  const firstImage = (row) => {
+    let raw = row?.image_url;
+    if (!raw && row?.images) {
+      let imgs = row.images;
+      if (typeof imgs === "string") { try { imgs = JSON.parse(imgs); } catch { imgs = null; } }
+      if (Array.isArray(imgs)) raw = imgs.find(Boolean);
+      else if (typeof row.images === "string") raw = row.images.split(/\r?\n/).map((s) => s.trim()).find(Boolean);
+    }
+    return raw;
+  };
+
+  const serveWithMeta = async (req, res, meta) => {
+    try {
+      let html = fs.readFileSync(path.join(DIST_DIR, "index.html"), "utf8");
+      const tags = [
+        `<title>${escHtml(meta.title)}</title>`,
+        `<meta name="description" content="${escHtml(meta.description)}" />`,
+        `<meta property="og:title" content="${escHtml(meta.title)}" />`,
+        `<meta property="og:description" content="${escHtml(meta.description)}" />`,
+        `<meta property="og:type" content="${meta.type || "website"}" />`,
+        `<meta property="og:url" content="${escHtml(meta.url)}" />`,
+        `<meta property="og:site_name" content="VedicUpchar" />`,
+        `<meta name="twitter:card" content="summary_large_image" />`,
+        `<meta name="twitter:title" content="${escHtml(meta.title)}" />`,
+        `<meta name="twitter:description" content="${escHtml(meta.description)}" />`,
+      ];
+      if (meta.image) {
+        tags.push(
+          `<meta property="og:image" content="${escHtml(meta.image)}" />`,
+          `<meta property="og:image:secure_url" content="${escHtml(meta.image)}" />`,
+          `<meta property="og:image:width" content="1200" />`,
+          `<meta property="og:image:height" content="630" />`,
+          `<meta name="twitter:image" content="${escHtml(meta.image)}" />`
+        );
+      }
+      // Purane default tags hatao (double meta se confuse hote hain crawlers)
+      html = html
+        .replace(/<title>[\s\S]*?<\/title>/i, "")
+        .replace(/<meta[^>]+(?:name|property)=["'](?:description|og:title|og:description|og:type|og:url|og:image|og:image:secure_url|og:image:width|og:image:height|og:site_name|twitter:card|twitter:title|twitter:description|twitter:image)["'][^>]*>\s*/gi, "");
+      html = html.replace(/<head(\s[^>]*)?>/i, (m) => `${m}\n    ${tags.join("\n    ")}`);
+      res.setHeader("Cache-Control", "no-cache");
+      res.type("html").send(html);
+    } catch (e) {
+      res.sendFile(path.join(DIST_DIR, "index.html"));
+    }
+  };
+
+  const shareMetaHandler = (kind) => async (req, res, next) => {
+    try {
+      const { q } = await import("./db.js");
+      const slug = req.params.slug;
+      const base = `${req.protocol}://${req.get("host")}`;
+      let meta = null;
+      if (kind === "product") {
+        const rows = await q(
+          "SELECT name, name_hi, short_description, description, image_url, images, price, mrp FROM products WHERE slug=? AND (is_active IS NULL OR is_active=1) LIMIT 1",
+          [slug]
+        );
+        const p = rows[0];
+        if (!p) return next();
+        const desc = stripHtml(p.short_description || p.description) || `Buy ${p.name} from VedicUpchar — authentic Ayurvedic formulations with fast delivery across India.`;
+        meta = {
+          title: `${p.name} | VedicUpchar Ayurveda`.slice(0, 70),
+          description: desc.slice(0, 158),
+          image: toAbsMedia(firstImage(p), base),
+          type: "product",
+          url: `${base}/product/${slug}`,
+        };
+      } else {
+        const rows = await q(
+          "SELECT title, excerpt, content, image_url, meta_title, meta_description FROM blogs WHERE slug=? AND (is_published IS NULL OR is_published=1) LIMIT 1",
+          [slug]
+        );
+        const b = rows[0];
+        if (!b) return next();
+        meta = {
+          title: (b.meta_title || `${b.title} | VedicUpchar Blog`).slice(0, 70),
+          description: stripHtml(b.meta_description || b.excerpt || b.content).slice(0, 158),
+          image: toAbsMedia(b.image_url, base),
+          type: "article",
+          url: `${base}/blog/${slug}`,
+        };
+      }
+      return serveWithMeta(req, res, meta);
+    } catch (e) {
+      return next(); // DB down -> normal SPA shell
+    }
+  };
+
+  app.get("/product/:slug", shareMetaHandler("product"));
+  app.get("/blog/:slug", shareMetaHandler("blog"));
+
   // SPA fallback — every non-API, non-upload GET returns index.html
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) return next();
