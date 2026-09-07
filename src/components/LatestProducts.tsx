@@ -1,3 +1,4 @@
+import ProductCountdown from "@/components/ProductCountdown";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ShoppingCart, Star } from "lucide-react";
@@ -82,6 +83,7 @@ const LatestProducts = () => {
                     <span className="font-bold text-lg md:text-xl text-foreground">₹{p['price']}</span>
                     {p['mrp'] > p['price'] && <span className="text-sm text-muted-foreground line-through">₹{p['mrp']}</span>}
                   </div>
+                  <div className="mb-3"><ProductCountdown compact product={p} /></div>
                   <button onClick={() => addToCart({ id: p.id, name: p.name, name_hi: p.name_hi, price: p['price'], mrp: p['mrp'], image_url: p.image_url, slug: p.slug })}
                     className="w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground py-2.5 rounded-xl text-xs md:text-sm font-semibold hover:opacity-90 hover:shadow-md transition-all">
                     <ShoppingCart className="h-3.5 w-3.5" /> {t("Add to Cart", "कार्ट में डालें")}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Timer } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { useCountdownDiscount, isDiscountActive, isProductDiscounted } from "@/hooks/use-countdown-discount";
 
 const getNextSunday = () => {
   const now = new Date();
@@ -12,44 +12,25 @@ const getNextSunday = () => {
   return nextSunday;
 };
 
-// Shared state across all instances
-let cachedEnabled: boolean | null = null;
-let fetchPromise: Promise<boolean> | null = null;
-
-const fetchCountdownEnabled = async (): Promise<boolean> => {
-  if (cachedEnabled !== null) return cachedEnabled;
-  if (fetchPromise) return fetchPromise;
-  fetchPromise = (async () => {
-    const { data } = await supabase
-      .from("site_settings")
-      .select("value")
-      .eq("key", "countdown_enabled")
-      .single();
-    cachedEnabled = data?.value === "true";
-    return cachedEnabled;
-  })();
-  return fetchPromise;
-};
-
-// Reset cache when admin changes it
-export const resetCountdownCache = () => { cachedEnabled = null; fetchPromise = null; };
-
-const ProductCountdown = ({ compact = false }: { compact?: boolean }) => {
+/**
+ * Sale countdown timer — admin ke "Countdown Discount" setting se chalta hai.
+ * endsAt set hai to wahi, warna agla Sunday 23:59 fallback.
+ * `product` dene par sirf us card pe dikhta hai jispe discount lag raha hai.
+ */
+const ProductCountdown = ({ compact = false, product }: { compact?: boolean; product?: any }) => {
+  const cfg = useCountdownDiscount();
   const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
-  const [enabled, setEnabled] = useState(false);
-  const [loaded, setLoaded] = useState(false);
+
+  const active = isDiscountActive(cfg) && (product ? isProductDiscounted(cfg, product) : true);
+  const endTime = cfg.endsAt ? new Date(cfg.endsAt).getTime() : getNextSunday().getTime();
 
   useEffect(() => {
-    fetchCountdownEnabled().then(v => { setEnabled(v); setLoaded(true); });
-  }, []);
-
-  useEffect(() => {
-    if (!enabled) return;
+    if (!active) return;
     const update = () => {
-      const diff = getNextSunday().getTime() - Date.now();
-      if (diff <= 0) return;
+      const diff = endTime - Date.now();
+      if (diff <= 0) { setTimeLeft({ h: 0, m: 0, s: 0 }); return; }
       setTimeLeft({
-        h: Math.floor(diff / (1000 * 60 * 60)) % 24 + Math.floor(diff / (1000 * 60 * 60 * 24)) * 24,
+        h: Math.floor(diff / (1000 * 60 * 60)),
         m: Math.floor((diff / (1000 * 60)) % 60),
         s: Math.floor((diff / 1000) % 60),
       });
@@ -57,9 +38,9 @@ const ProductCountdown = ({ compact = false }: { compact?: boolean }) => {
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
-  }, [enabled]);
+  }, [active, endTime]);
 
-  if (!loaded || !enabled) return null;
+  if (!active || (timeLeft.h + timeLeft.m + timeLeft.s) <= 0) return null;
 
   if (compact) {
     return (
@@ -79,3 +60,6 @@ const ProductCountdown = ({ compact = false }: { compact?: boolean }) => {
 };
 
 export default ProductCountdown;
+
+// Admin preview ke liye cache reset ab zaroori nahi — hook khud 30s TTL rakhta hai.
+export const resetCountdownCache = () => {};

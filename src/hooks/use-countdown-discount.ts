@@ -103,6 +103,9 @@ const eligible = (cfg: CountdownDiscount, p: any) => {
   return false;
 };
 
+/** Public: kya is product pe countdown discount lag raha hai (multi-category aware). */
+export const isProductDiscounted = eligible;
+
 /**
  * Applies the live countdown discount to a list of products so listings,
  * cards and the product page all show the same sale price.
