@@ -149,6 +149,7 @@ const ConcernProducts = () => {
                     <span className="font-bold text-lg md:text-xl text-foreground">₹{p['price']}</span>
                     {p['mrp'] > p['price'] && <span className="text-sm text-muted-foreground line-through">₹{p['mrp']}</span>}
                   </div>
+                  <div className="mb-3"><ProductCountdown compact product={p} /></div>
                   <div className="flex gap-1.5 md:gap-2">
                     <button onClick={() => addToCart({ id: p.id, name: p.name, name_hi: p.name_hi, price: p['price'], mrp: p['mrp'], image_url: p.image_url, slug: p.slug })}
                       className="flex-1 flex items-center justify-center gap-1 bg-primary text-primary-foreground py-2 md:py-2.5 rounded-lg md:rounded-xl text-[11px] md:text-sm font-semibold hover:opacity-90 transition">

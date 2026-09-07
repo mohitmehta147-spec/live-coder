@@ -87,6 +87,7 @@ const CategoryProducts = () => {
                             <span className="font-bold text-sm text-foreground">₹{p['price']}</span>
                             {p['mrp'] > p['price'] && <span className="text-xs text-muted-foreground line-through">₹{p['mrp']}</span>}
                           </div>
+                          <div className="mb-2"><ProductCountdown compact product={p} /></div>
                           <button onClick={() => addToCart({ id: p.id, name: p.name, name_hi: p.name_hi, price: p['price'], mrp: p['mrp'], image_url: p.image_url, slug: p.slug })}
                             className="w-full flex items-center justify-center gap-1.5 bg-primary text-primary-foreground py-2 rounded-lg text-[11px] md:text-xs font-semibold hover:opacity-90 transition">
                             <ShoppingCart className="h-3.5 w-3.5" /> {t("Add to Cart", "कार्ट में डालें")}
