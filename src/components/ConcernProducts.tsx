@@ -1,3 +1,4 @@
+import ProductCountdown from "@/components/ProductCountdown";
 import { useEffect, useMemo, useState } from "react";
 import { ShoppingCart, Star, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
