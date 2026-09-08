@@ -408,9 +408,34 @@ const AdminBlogs = () => {
             )}
 
             <div>
-              <p className="text-xs font-semibold mb-1 text-muted-foreground">Content (Hindi)</p>
-              <RichEditor value={form.content_hi} onChange={html => setForm(f => ({ ...f, content_hi: html }))} minHeight={140} />
+              <p className="text-xs font-semibold mb-1 text-muted-foreground">Content (Hindi) — visual editor, WordPress jaisa</p>
+              <RichEditor value={form.content_hi} onChange={html => setForm(f => ({ ...f, content_hi: html }))} minHeight={220} />
             </div>
+
+            {/* Live Preview Hindi */}
+            {form.content_hi && (
+              <div className="border border-border rounded-lg overflow-hidden">
+                <div className="flex items-center justify-between bg-muted/50 px-3 py-2 border-b border-border">
+                  <span className="text-xs font-semibold flex items-center gap-1"><Eye className="h-3.5 w-3.5" /> Live Preview (Hindi)</span>
+                  <span className="text-[10px] text-muted-foreground">Same layout as published blog</span>
+                </div>
+                <div className="p-4 bg-background max-h-[500px] overflow-y-auto">
+                  <h1 className="text-2xl font-bold text-foreground mb-3 leading-tight">{form.title_hi || form.title || "Your blog title"}</h1>
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4 pb-3 border-b border-border">
+                    <span className="flex items-center gap-1.5"><User className="h-3 w-3" /> {form.author || "admin"}</span>
+                    <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+                    {form.category && <span>Categories: <span className="text-primary font-medium">{form.category}</span></span>}
+                  </div>
+                  {form.image_url && (
+                    <img loading="lazy" decoding="async" src={form.image_url} alt="" className="w-full rounded-xl mb-4 object-cover max-h-[300px]" />
+                  )}
+                  <div
+                    className="prose prose-sm max-w-none text-foreground prose-headings:text-foreground prose-headings:font-bold prose-h2:text-xl prose-h2:mt-6 prose-h2:mb-3 prose-h3:text-lg prose-h3:mt-4 prose-h3:mb-2 prose-p:leading-relaxed prose-p:mb-3 prose-li:marker:text-primary prose-a:text-primary prose-strong:text-foreground prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:rounded-r-lg prose-blockquote:py-2 prose-blockquote:px-3 prose-img:rounded-xl prose-img:mx-auto prose-img:w-full"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(autoFormat(form.content_hi), { USE_PROFILES: { html: true } }) }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
 
