@@ -176,7 +176,21 @@ function resolveMedia<T>(value: T): T {
   if (value == null) return value;
   if (typeof value === "string") {
     const resolvedTokens = value.replace(MEDIA_TOKEN, API_BASE);
-    return rehostMedia(refreshEmbeddedUploadUrls(resolvedTokens)) as unknown as T;
+    const prepared = refreshEmbeddedUploadUrls(resolvedTokens);
+    // Multi-line media fields (banner_image, banner_image_mobile: up to 5 URLs,
+    // one per line) must be rehosted line by line, warna poori string ek hi URL
+    // maani jaati thi aur sirf pehla banner render hota tha.
+    if (/\r?\n/.test(prepared)) {
+      return prepared
+        .split(/\r?\n/)
+        .map((line) => {
+          const t = line.trim();
+          return t ? rehostMedia(t) : "";
+        })
+        .filter(Boolean)
+        .join("\n") as unknown as T;
+    }
+    return rehostMedia(prepared) as unknown as T;
   }
   if (Array.isArray(value)) return value.map(resolveMedia) as unknown as T;
   if (typeof value === "object") {
