@@ -273,8 +273,11 @@ const CheckoutPage = () => {
     const totalDiscountForOrder = discount + appliedPrepaid + tierDiscount;
     // Snapshot of cart items, also stored on orders.items as a safety net so admin
     // can always render line items even if the order_items insert fails for any reason.
+    const lineName = (item: typeof items[number]) =>
+      item.variant_label ? `${item.name} (${item.variant_label})` : item.name;
     const itemsSnapshot = items.map(item => ({
-      product_id: item.id, product_name: item.name, name: item.name,
+      product_id: item.product_id || item.id, product_name: lineName(item), name: lineName(item),
+      variant: item.variant_label || null,
       quantity: item.quantity, price: item['price'],
     }));
     const { data: order, error } = await supabase.from("orders").insert([{
