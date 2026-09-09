@@ -637,6 +637,9 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium line-clamp-1">{lang === "hi" && item.name_hi ? item.name_hi : item.name}</p>
+                    {item.variant_label && (
+                      <p className="mt-0.5 text-[11px] font-semibold text-primary">{item.variant_label}</p>
+                    )}
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                       <div className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-1 py-0.5 shadow-sm">
                         <button
