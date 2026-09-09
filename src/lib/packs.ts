@@ -53,7 +53,9 @@ export const formatQuantity = (qty: number, unit?: string): string => {
 /** Price per single base unit, e.g. "₹3.45/GM". */
 export const perUnitLabel = (price: number, qty: number, unit?: string): string => {
   if (!price || !qty || qty <= 0) return "";
-  const rate = +(price / qty).toFixed(2);
+  const raw = price / qty;
+  // Whole rupees for readable rates (₹524.5 → ₹525); keep 2 decimals only for tiny rates.
+  const rate = raw >= 10 ? Math.round(raw) : +raw.toFixed(2);
   const label = unitLabel(unit) || "unit";
   return `₹${rate}/${label}`;
 };
@@ -83,7 +85,7 @@ export const withPackInfo = (
   };
 };
 
-/** Display as "120 GM * 2" (base pack size x pack count). */
+/** Display as "120 GM × 2 = 240 GM" (base pack size x pack count = total). */
 export const formatPackSize = (
   base: number,
   unit?: string | null,
@@ -91,7 +93,10 @@ export const formatPackSize = (
 ): string => {
   const b = formatQuantity(Number(base) || 0, unit || undefined);
   if (!b) return "";
-  return `${b} * ${Math.max(1, Math.round(packQty) || 1)}`;
+  const n = Math.max(1, Math.round(packQty) || 1);
+  if (n === 1) return b;
+  const total = formatQuantity((Number(base) || 0) * n, unit || undefined);
+  return `${b} × ${n} = ${total}`;
 };
 
 export const withPackInfoAll = (
