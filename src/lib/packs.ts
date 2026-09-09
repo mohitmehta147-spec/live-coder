@@ -85,7 +85,7 @@ export const withPackInfo = (
   };
 };
 
-/** Display as "120 GM * 2" (base pack size x pack count). */
+/** Display as "120 GM × 2 = 240 GM" (base pack size x pack count = total). */
 export const formatPackSize = (
   base: number,
   unit?: string | null,
@@ -93,7 +93,10 @@ export const formatPackSize = (
 ): string => {
   const b = formatQuantity(Number(base) || 0, unit || undefined);
   if (!b) return "";
-  return `${b} * ${Math.max(1, Math.round(packQty) || 1)}`;
+  const n = Math.max(1, Math.round(packQty) || 1);
+  if (n === 1) return b;
+  const total = formatQuantity((Number(base) || 0) * n, unit || undefined);
+  return `${b} × ${n} = ${total}`;
 };
 
 export const withPackInfoAll = (
