@@ -273,11 +273,8 @@ const CheckoutPage = () => {
     const totalDiscountForOrder = discount + appliedPrepaid + tierDiscount;
     // Snapshot of cart items, also stored on orders.items as a safety net so admin
     // can always render line items even if the order_items insert fails for any reason.
-    const lineName = (item: typeof items[number]) =>
-      item.variant_label ? `${item.name} (${item.variant_label})` : item.name;
     const itemsSnapshot = items.map(item => ({
-      product_id: item.product_id || item.id, product_name: lineName(item), name: lineName(item),
-      variant: item.variant_label || null,
+      product_id: item.id, product_name: item.name, name: item.name,
       quantity: item.quantity, price: item['price'],
     }));
     const { data: order, error } = await supabase.from("orders").insert([{
@@ -297,7 +294,7 @@ const CheckoutPage = () => {
     }
 
     const orderItems = items.map(item => ({
-      order_id: order.id, product_id: item.product_id || item.id, product_name: lineName(item),
+      order_id: order.id, product_id: item.id, product_name: item.name,
       quantity: item.quantity, price: item['price'],
     }));
     const { error: itemsErr } = await supabase.from("order_items").insert(orderItems);
@@ -313,7 +310,7 @@ const CheckoutPage = () => {
         order_number: order.order_number || order.id,
         customer_name: cleanName, phone: cleanPhone, email: form.email,
         address: cleanAddress, city: form.city, state: form.state, pincode: form.pincode,
-        items: items.map(i => `${lineName(i)} x${i.quantity} (₹${i['price']})`).join("\n"),
+        items: items.map(i => `${i.name} x${i.quantity} (₹${i['price']})`).join("\n"),
         subtotal: `₹${totalPrice}`, discount: `₹${totalDiscountForOrder}`, shipping: `₹${appliedShipping}`, total: `₹${finalTotal}`,
         payment_method: paymentMethod, coupon: appliedCoupon?.code,
       },
@@ -327,7 +324,7 @@ const CheckoutPage = () => {
       await supabase.functions.invoke("send-order-email", {
         body: {
           orderId, customerEmail: form.email, customerName: form.name, customerPhone: form['phone'],
-          items: items.map(item => ({ order_id: orderId, product_id: item.product_id || item.id, product_name: item.variant_label ? `${item.name} (${item.variant_label})` : item.name, quantity: item.quantity, price: item['price'] })),
+          items: items.map(item => ({ order_id: orderId, product_id: item.id, product_name: item.name, quantity: item.quantity, price: item['price'] })),
           subtotal: totalPrice, discount, total: finalTotal,
           address: form.address, city: form.city || "", pincode: form.pincode || "",
           couponCode: appliedCoupon?.code || "",
@@ -637,9 +634,6 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium line-clamp-1">{lang === "hi" && item.name_hi ? item.name_hi : item.name}</p>
-                    {item.variant_label && (
-                      <p className="mt-0.5 text-[11px] font-semibold text-primary">{item.variant_label}</p>
-                    )}
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
                       <div className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-1 py-0.5 shadow-sm">
                         <button

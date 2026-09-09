@@ -72,9 +72,6 @@ const CartSidebar = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-medium text-sm line-clamp-2">{lang === "hi" && item.name_hi ? item.name_hi : item.name}</h3>
-                  {item.variant_label && (
-                    <p className="mt-0.5 text-[11px] font-semibold text-primary">{item.variant_label}</p>
-                  )}
                   <div className="flex items-center gap-2 mt-1">
                     <span className="font-bold text-primary">₹{item['price']}</span>
                     {item['mrp'] > item['price'] && <span className="text-xs text-muted-foreground line-through">₹{item['mrp']}</span>}

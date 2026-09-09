@@ -2,10 +2,6 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 
 export type CartItem = {
   id: string;
-  /** Real product id (id may be a composite "productId::variant" key). */
-  product_id?: string;
-  /** e.g. "Pack of 2 — 2 Piece * 2 (Total 4 Piece)" */
-  variant_label?: string | null;
   name: string;
   name_hi: string | null;
   price: number;
