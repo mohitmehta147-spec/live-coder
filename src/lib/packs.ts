@@ -53,7 +53,9 @@ export const formatQuantity = (qty: number, unit?: string): string => {
 /** Price per single base unit, e.g. "₹3.45/GM". */
 export const perUnitLabel = (price: number, qty: number, unit?: string): string => {
   if (!price || !qty || qty <= 0) return "";
-  const rate = +(price / qty).toFixed(2);
+  const raw = price / qty;
+  // Whole rupees for readable rates (₹524.5 → ₹525); keep 2 decimals only for tiny rates.
+  const rate = raw >= 10 ? Math.round(raw) : +raw.toFixed(2);
   const label = unitLabel(unit) || "unit";
   return `₹${rate}/${label}`;
 };
