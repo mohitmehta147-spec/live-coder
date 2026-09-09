@@ -327,7 +327,7 @@ const CheckoutPage = () => {
       await supabase.functions.invoke("send-order-email", {
         body: {
           orderId, customerEmail: form.email, customerName: form.name, customerPhone: form['phone'],
-          items: items.map(item => ({ order_id: orderId, product_id: item.id, product_name: item.name, quantity: item.quantity, price: item['price'] })),
+          items: items.map(item => ({ order_id: orderId, product_id: item.product_id || item.id, product_name: item.variant_label ? `${item.name} (${item.variant_label})` : item.name, quantity: item.quantity, price: item['price'] })),
           subtotal: totalPrice, discount, total: finalTotal,
           address: form.address, city: form.city || "", pincode: form.pincode || "",
           couponCode: appliedCoupon?.code || "",
