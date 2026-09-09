@@ -313,7 +313,7 @@ const CheckoutPage = () => {
         order_number: order.order_number || order.id,
         customer_name: cleanName, phone: cleanPhone, email: form.email,
         address: cleanAddress, city: form.city, state: form.state, pincode: form.pincode,
-        items: items.map(i => `${i.name} x${i.quantity} (₹${i['price']})`).join("\n"),
+        items: items.map(i => `${lineName(i)} x${i.quantity} (₹${i['price']})`).join("\n"),
         subtotal: `₹${totalPrice}`, discount: `₹${totalDiscountForOrder}`, shipping: `₹${appliedShipping}`, total: `₹${finalTotal}`,
         payment_method: paymentMethod, coupon: appliedCoupon?.code,
       },
