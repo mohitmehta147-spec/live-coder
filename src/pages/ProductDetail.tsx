@@ -215,7 +215,16 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (outOfStock) return;
-    addToCart({ id: product.id, name: product.name, name_hi: product.name_hi, price: effectivePrice, mrp: baseMrp, image_url: product.image_url, slug: product.slug }, quantity);
+    const variantLabel = activeVar
+      ? [activeVar.label, (activeVar as any).size].filter(Boolean).join(" — ")
+      : null;
+    addToCart({
+      id: activeVar ? `${product.id}::${activeVar.label}` : product.id,
+      product_id: product.id,
+      variant_label: variantLabel,
+      name: product.name, name_hi: product.name_hi,
+      price: effectivePrice, mrp: baseMrp, image_url: product.image_url, slug: product.slug,
+    }, quantity);
   };
 
   const handleBuyNow = () => {
