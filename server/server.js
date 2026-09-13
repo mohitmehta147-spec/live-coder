@@ -445,6 +445,18 @@ if (hasBuild) {
   app.get("/product/:slug", shareMetaHandler("product"));
   app.get("/blog/:slug", shareMetaHandler("blog"));
 
+  // Homepage share card: use the real VedicUpchar logo and a short mobile-safe line.
+  app.get("/", (req, res) => {
+    const base = `${req.protocol}://${req.get("host")}`;
+    return serveWithMeta(req, res, {
+      title: "VedicUpchar | Authentic Ayurvedic Healthcare",
+      description: "Authentic Ayurvedic medicines, herbal wellness products and free doctor consultation.",
+      image: `${base}/logo.png?v=2`,
+      type: "website",
+      url: `${base}/`,
+    });
+  });
+
   // SPA fallback — every non-API, non-upload GET returns index.html
   app.get("*", (req, res, next) => {
     if (req.path.startsWith("/api") || req.path.startsWith("/uploads")) return next();

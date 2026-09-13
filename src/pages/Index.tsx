@@ -21,8 +21,8 @@ import { Loader2 } from "lucide-react";
 
 const Index = () => {
   usePageMeta(
-    "VedicUpchar - Authentic Ayurvedic Healthcare Products & Doctor Consultation",
-    "Shop 100% authentic Ayurvedic medicines, herbal products & get free doctor consultation. Trusted by 20 Lakh+ customers. Free delivery on orders above ₹699."
+    "VedicUpchar | Authentic Ayurvedic Healthcare",
+    "Authentic Ayurvedic medicines, herbal wellness products and free doctor consultation from VedicUpchar."
   );
 
   const isFetching = useIsFetching();

@@ -6,26 +6,26 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title:
-          "VedicUpchar - Authentic Ayurvedic Healthcare Products & Doctor Consultation",
+        title: "VedicUpchar | Authentic Ayurvedic Healthcare",
       },
       {
         name: "description",
         content:
-          "Shop 100% authentic Ayurvedic medicines, herbal products & get free doctor consultation. Trusted by 20 Lakh+ customers. Free delivery on orders above ₹699.",
+          "Authentic Ayurvedic medicines, herbal wellness products and free doctor consultation from VedicUpchar.",
       },
       {
         property: "og:title",
-        content:
-          "VedicUpchar - Authentic Ayurvedic Healthcare Products & Doctor Consultation",
+        content: "VedicUpchar | Authentic Ayurvedic Healthcare",
       },
       {
         property: "og:description",
         content:
-          "Shop 100% authentic Ayurvedic medicines, herbal products & get free doctor consultation.",
+          "Authentic Ayurvedic medicines, herbal wellness products and free doctor consultation.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: "https://www.vedicupchar.com/logo.png?v=2" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://www.vedicupchar.com/logo.png?v=2" },
     ],
   }),
 });
