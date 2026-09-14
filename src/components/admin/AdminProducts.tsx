@@ -19,6 +19,32 @@ type Product = {
 
 type Category = { id: string; name: string; parent_id: string | null };
 
+type ProductFaq = { q: string; a: string };
+
+const normalizeFaqs = (value: unknown): ProductFaq[] => {
+  let parsed = value;
+
+  for (let attempt = 0; attempt < 2 && typeof parsed === "string"; attempt++) {
+    const text = parsed.trim();
+    if (!text) return [];
+    try { parsed = JSON.parse(text); } catch { return []; }
+  }
+
+  const items = Array.isArray(parsed)
+    ? parsed
+    : parsed && typeof parsed === "object"
+      ? Object.values(parsed as Record<string, unknown>)
+      : [];
+
+  return items.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const row = item as Record<string, unknown>;
+    const q = String(row.q ?? row.question ?? row.title ?? "").trim();
+    const a = String(row.a ?? row.answer ?? row.content ?? "").trim();
+    return q || a ? [{ q, a }] : [];
+  });
+};
+
 const defaultFeatures = [
   { icon: "🌿", text: "100% Herbal" },
   { icon: "✅", text: "Clinically Proven" },
@@ -124,7 +150,7 @@ const AdminProducts = () => {
   const [newFeature, setNewFeature] = useState({ icon: "🌿", text: "" });
   const [benefits, setBenefits] = useState<{ icon: string; title: string; description: string }[]>([]);
   const [ingredients, setIngredients] = useState<{ icon: string; name: string; description: string }[]>([]);
-  const [faqs, setFaqs] = useState<{ q: string; a: string }[]>([]);
+  const [faqs, setFaqs] = useState<ProductFaq[]>([]);
   const [variations, setVariations] = useState<{ label: string; mrp: number; price: number; image?: string; tagline?: string }[]>([]);
 
 
@@ -134,6 +160,7 @@ const AdminProducts = () => {
     const rows = ((data as any[]) || []).map((p) => ({
       ...p,
       is_active: p.is_active === null || p.is_active === undefined ? true : !(p.is_active === 0 || p.is_active === false || p.is_active === "0" || p.is_active === "false"),
+      faqs: normalizeFaqs(p.faqs),
     }));
     setProducts(rows as any);
     setLoading(false);
@@ -398,7 +425,7 @@ const AdminProducts = () => {
     setFeatures(Array.isArray(p.features) ? p.features : []);
     setBenefits(Array.isArray(pAny.benefits) ? pAny.benefits : []);
     setIngredients(Array.isArray(pAny.ingredients) ? pAny.ingredients : []);
-    setFaqs(Array.isArray(pAny.faqs) ? pAny.faqs : []);
+    setFaqs(normalizeFaqs(pAny.faqs));
     setVariations(Array.isArray(pAny['variations']) ? pAny['variations'] : []);
     setShowForm(true);
     setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
