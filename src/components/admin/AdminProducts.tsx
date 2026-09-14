@@ -386,19 +386,23 @@ const AdminProducts = () => {
     fetchProducts();
   };
 
-  const handleEdit = (p: Product) => {
-    setEditing(p);
-    const pAny = p as any;
+  const handleEdit = async (p: Product) => {
+    // Always fetch the complete current row before opening the editor. This
+    // avoids an older/cached product-list row hiding structured fields such as FAQs.
+    const { data: freshProduct } = await supabase.from("products").select("*").eq("id", p.id).maybeSingle();
+    const source = (freshProduct || p) as Product;
+    setEditing(source);
+    const pAny = source as any;
     setForm({
-      name: p.name, name_hi: p.name_hi || "", price: String(p['price']), mrp: String(p['mrp']),
-      stock: String(p.stock), badge: p.badge || "", slug: p.slug, description: p.description || "",
-      description_hi: p.description_hi || "", sku: p.sku || "",
-      is_active: p.is_active !== false, category_id: p['category_id'] || "",
-      rating: String(p.rating || ""), reviews_count: String(p.reviews_count || ""),
-      sizes: (p.sizes || []).join(", "),
-      tags: (p.tags || []).join(", "),
-      meta_title: p.meta_title || "",
-      meta_description: p.meta_description || "",
+      name: source.name, name_hi: source.name_hi || "", price: String(source['price']), mrp: String(source['mrp']),
+      stock: String(source.stock), badge: source.badge || "", slug: source.slug, description: source.description || "",
+      description_hi: source.description_hi || "", sku: source.sku || "",
+      is_active: source.is_active !== false, category_id: source['category_id'] || "",
+      rating: String(source.rating || ""), reviews_count: String(source.reviews_count || ""),
+      sizes: (source.sizes || []).join(", "),
+      tags: (source.tags || []).join(", "),
+      meta_title: source.meta_title || "",
+      meta_description: source.meta_description || "",
       sale_price: pAny.sale_price ? String(pAny.sale_price) : "",
       sale_starts_at: pAny.sale_starts_at ? new Date(pAny.sale_starts_at).toISOString().slice(0,16) : "",
       sale_ends_at: pAny.sale_ends_at ? new Date(pAny.sale_ends_at).toISOString().slice(0,16) : "",
@@ -416,13 +420,13 @@ const AdminProducts = () => {
       variation_label: pAny.variation_label || "",
       variation_display: pAny.variation_display || "card",
     });
-    setUploadedImages(p.images || (p.image_url ? [p.image_url] : []));
+    setUploadedImages(source.images || (source.image_url ? [source.image_url] : []));
     setExtraCategories(((): string[] => {
       const raw = (pAny['category_ids'] ?? []) as any;
       const list: string[] = Array.isArray(raw) ? raw : (() => { try { return JSON.parse(raw || "[]"); } catch { return []; } })();
-      return list.filter((c: string) => c && c !== p['category_id']);
+      return list.filter((c: string) => c && c !== source['category_id']);
     })());
-    setFeatures(Array.isArray(p.features) ? p.features : []);
+    setFeatures(Array.isArray(source.features) ? source.features : []);
     setBenefits(Array.isArray(pAny.benefits) ? pAny.benefits : []);
     setIngredients(Array.isArray(pAny.ingredients) ? pAny.ingredients : []);
     setFaqs(normalizeFaqs(pAny.faqs));
