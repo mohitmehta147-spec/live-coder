@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep Meta Pixel settings in a dedicated admin tab and separate saving an ID from enabling tracking, because health-related page data requires eligibility and consent review first.
