@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep Meta Pixel settings in a dedicated admin tab and separate saving an ID from enabling tracking, because health-related page data requires eligibility and consent review first.
+- Keep the Meta Pixel ID in the existing site-settings store with a dedicated admin tab, separate from tag activation, because health-related page data requires eligibility and consent review first.
