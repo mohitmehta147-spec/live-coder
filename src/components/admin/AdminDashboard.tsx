@@ -40,8 +40,10 @@ import AdminConsultationTypes from "./AdminConsultationTypes";
 import AdminTopSelling from "./AdminTopSelling";
 import AdminReels from "./AdminReels";
 import AdminHealth from "./AdminHealth";
+import AdminMetaPixel from "./AdminMetaPixel";
 
 const tabs = [
+  { id: "overview", label: "Dashboard", icon: LayoutDashboard },
   // Fixed top order (requested)
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "leads", label: "All Leads", icon: Inbox },
@@ -76,6 +78,7 @@ const tabs = [
   { id: "delivery", label: "Delivery Settings", icon: Truck },
   { id: "colors", label: "Colors & Theme", icon: Palette },
   { id: "credentials", label: "API Credentials", icon: Key },
+  { id: "meta-pixel", label: "Meta Pixel", icon: Activity },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "trash", label: "Trash", icon: Trash2 },
   { id: "health", label: "API Health", icon: Activity },
@@ -115,6 +118,7 @@ const tabComponents: Record<string, ComponentType<any>> = {
   delivery: AdminDeliverySettings,
   colors: AdminColorSettings,
   credentials: AdminCredentials,
+  "meta-pixel": AdminMetaPixel,
   settings: AdminSettings,
   trash: AdminTrash,
   health: AdminHealth,
