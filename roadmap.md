@@ -1,4 +1,4 @@
 - [x] Add a visible Dashboard tab and a dedicated Meta Pixel settings tab.
 - [x] Store the requested Pixel ID without firing tracking events.
 - [x] Remove existing Pixel scripts from health-related product pages.
-- [ ] Apply the required dependency security update and verify the preview build.
+- [x] Apply the required dependency security update and verify the preview build.
