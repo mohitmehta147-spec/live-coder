@@ -1,4 +1,5 @@
-- [x] Add a visible Dashboard tab and a dedicated Meta Pixel settings tab.
-- [x] Store the requested Pixel ID without firing tracking events.
-- [x] Remove existing Pixel scripts from health-related product pages.
-- [x] Apply the required dependency security update and verify the preview build.
+- [x] Keep the admin overview named Dashboard and add a separate Meta Pixel settings tab.
+- [x] Remove old Pixel scripts from health-related product pages; do not enable health-page tracking.
+- [ ] Fix the Hostinger build script to copy the generated SPA shell as index.html.
+- [ ] Ensure homepage rendering is safe for server prerendering and validate Hostinger build output.
+- [ ] Explain that Meta Pixel tracking on health-product pages cannot be installed under the platform's health-data restrictions.
