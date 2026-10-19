@@ -96,12 +96,12 @@ export default defineConfig({
     tanstackStart({
       // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
       server: { entry: "server" },
-      // Hostinger (Express) serves a static SPA — emit dist/client/index.html
-      // instead of the SSR worker bundle. All data fetching is client-side.
+      // Hostinger (Express) serves the generated SPA shell as dist/client/index.html.
+      // Use a named output path so the shell survives on hosts that need a post-build copy.
       spa: {
         enabled: true,
         maskPath: "/",
-        prerender: { enabled: false, outputPath: "/", crawlLinks: false, retryCount: 1 },
+        prerender: { enabled: false, outputPath: "/_shell", crawlLinks: false, retryCount: 1 },
       },
     }),
     viteReact(),
