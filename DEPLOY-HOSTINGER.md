@@ -11,10 +11,10 @@ Ek hi Node app frontend + API + uploads sab serve karta hai.
 ```sh
 # local
 npm install
-npm run build          # dist/client/ banega — isme index.html (SPA shell) bhi auto-copy hota hai
+npm run build          # dist/client/index.html SPA shell ke roop mein taiyar hoga
 ```
 Note: build ke baad `dist/client/index.html` zaroor hona chahiye (SPA shell). Build script
-(`package.json`) ye khud copy kar deta hai — agar manually build kiya ho to check kar lein:
+(`package.json`) TanStack ke `dist/client/_shell.html` ko sahi naam se copy karta hai — agar manually build kiya ho to check kar lein:
 ```sh
 ls dist/client/index.html   # exist karna chahiye
 ```

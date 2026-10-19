@@ -38,17 +38,24 @@ const CartContext = createContext<CartContextType>({
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem("cart");
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [cartLoaded, setCartLoaded] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem("cart");
+      if (saved) setItems(JSON.parse(saved));
+    } catch {
+      setItems([]);
+    }
+    setCartLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!cartLoaded) return;
     localStorage.setItem("cart", JSON.stringify(items));
-  }, [items]);
+  }, [cartLoaded, items]);
 
   const addToCart = (item: Omit<CartItem, "quantity">, qty = 1) => {
     setItems((prev) => {
